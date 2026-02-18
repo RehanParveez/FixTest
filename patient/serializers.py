@@ -10,3 +10,5 @@ class ClaimSerializer(serializers.ModelSerializer):
     class Meta:
         model = Claim
         fields = ['title', 'patient', 'procedure', 'status', 'created_at']
+        
+        

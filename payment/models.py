@@ -8,3 +8,5 @@ class Payment(models.Model):
     claim = models.ForeignKey(Claim, on_delete=models.CASCADE, related_name='payments')
     created_at = models.DateTimeField(auto_now_add=True)
     
+    def __str__(self):
+        return self.amount

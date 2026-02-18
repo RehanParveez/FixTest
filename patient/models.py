@@ -1,6 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
-from organization.models import Practice, Organization, Procedure
+from organization.models import Practice, Procedure
 
 # Create your models here.
 class Patient(models.Model):
@@ -8,6 +7,9 @@ class Patient(models.Model):
     phone = models.CharField(max_length=15)
     practice = models.ForeignKey(Practice, on_delete=models.CASCADE, related_name='patients')
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.name
     
 class Claim(models.Model):
     STATUS_CHOICES = (
@@ -19,3 +21,8 @@ class Claim(models.Model):
     procedure = models.ManyToManyField(Procedure, related_name='procedures')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.title
+    
+    
