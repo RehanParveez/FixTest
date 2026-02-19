@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from organization.models import Organization, Practice, Procedure
-from django.contrib.auth.models import User
+from organization.models import Organization, Practice, User, Procedure
 
 class OrganizationSerializers(serializers.ModelSerializer):
     class Meta:
@@ -10,12 +9,12 @@ class OrganizationSerializers(serializers.ModelSerializer):
 class PracticeSerializers(serializers.ModelSerializer):
     class Meta:
         model = Practice
-        fields = ['name', 'location', 'phone' 'organization', 'created_at']
+        fields = ['name', 'location', 'organization', 'created_at']
         
 class UserSerializers(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'phone', 'created_at', 'organization', 'practice', 'dob']
+        fields = ['id', 'email', 'username', 'phone', 'created_at', 'organization', 'practice', 'dob', 'control']
         
     def create(self, validated_data):
         user=User.objects.create_user(
@@ -33,6 +32,5 @@ class ProcedureSerializers(serializers.ModelSerializer):
     class Meta:
         model = Procedure
         fields = ['title', 'cost', 'created_at']
-        
         
         

@@ -19,16 +19,20 @@ class Practice(models.Model):
         return self.name
     
 class User(AbstractUser):
-    name = models.CharField(max_length=20)
-    email = models.EmailField()
-    phone = models.IntegerField()
+    CONTROL_CHOICES = (
+        ('supadm', 'SupAdm'),
+        ('orgadm', 'OrgAdm'),
+        ('pracadm', 'PracAdm')
+    )
+    phone = models.CharField(max_length=20 ,null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='users')
-    practice = models.ForeignKey(Practice, on_delete=models.CASCADE, related_name='users')
-    dob = models.DateField()
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, null=True, related_name='users')
+    practice = models.ForeignKey(Practice, on_delete=models.CASCADE, null=True, related_name='users')
+    dob = models.DateField(null=True)
+    control = models.CharField(max_length=20, choices=CONTROL_CHOICES, default='pracadm')
     
     def __str__(self):
-        return self.name
+        return self.username
     
 class Procedure(models.Model):
     title = models.CharField(max_length=20)

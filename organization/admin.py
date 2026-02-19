@@ -12,7 +12,7 @@ class PracticeAdmin(admin.ModelAdmin):
     
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ['id', 'email', 'name', 'phone', 'created_at', 'organization', 'practice', 'dob']
+    list_display = ['phone', 'created_at', 'organization', 'practice', 'dob', 'control']
     
 @admin.register(Procedure)
 class ProcedureAdmin(admin.ModelAdmin):
