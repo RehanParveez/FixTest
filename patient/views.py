@@ -14,8 +14,8 @@ class PatientViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
     # fields to filter
-    search_field = ['name']
-    ordering_field = ['created_at']
+    search_fields = ['name']
+    ordering_fields = ['created_at']
     
     def get_queryset(self):
         user = self.request.user
@@ -33,8 +33,8 @@ class ClaimViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
     # fields to filter
-    search_field = ['title']
-    ordering_field = ['created_at']
+    search_fields = ['title']
+    ordering_fields = ['created_at']
     
     def get_queryset(self):
         user = self.request.user

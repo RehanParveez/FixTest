@@ -14,12 +14,13 @@ class PracticeSerializers(serializers.ModelSerializer):
 class UserSerializers(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'email', 'username', 'phone', 'created_at', 'organization', 'practice', 'dob', 'control']
+        fields = ['id', 'email', 'username', 'password', 'phone', 'created_at', 'organization', 'practice', 'dob', 'control']
         
     def create(self, validated_data):
         user=User.objects.create_user(
-            name=validated_data.get('name'),
+            username=validated_data.get('username'),
             email=validated_data.get('email'),
+            password=validated_data.get('password'),
             phone=validated_data.get('phone'),
             created_at=validated_data.get('created_at'),
             organization=validated_data.get('organization'),

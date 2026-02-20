@@ -14,8 +14,8 @@ class PaymentViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
     # fields to filter
-    search_field = ['amount']
-    ordering_field = ['created_at']
+    search_fields = ['amount']
+    ordering_fields = ['created_at']
     
     def get_queryset(self):
         user = self.request.user
@@ -25,5 +25,5 @@ class PaymentViewset(viewsets.ModelViewSet):
             return Payment.objects.filter(claim_patient_practice_organization=user.organization)
         if user.control == 'pracadm':
             return Payment.objects.filter(claim_patient_practice=user.practice)
-    
+            
 

@@ -1,11 +1,12 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from organization.models import Organization, Practice, Procedure
-from organization.serializers import OrganizationSerializers, PracticeSerializers, ProcedureSerializers
+from organization.models import Organization, Practice, User, Procedure
+from organization.serializers import OrganizationSerializers, PracticeSerializers, UserSerializers, ProcedureSerializers
 from rest_framework import permissions
 from organization.permissions import SuperPermission
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from rest_framework.authentication import SessionAuthentication
 
 # Create your views here.
 class OrganizationViewset(viewsets.ModelViewSet):
@@ -15,8 +16,8 @@ class OrganizationViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
     # fields to filter
-    search_field = ['name']
-    ordering_field = ['created_at']
+    search_fields = ['name']
+    ordering_fields = ['created_at']
     
     def get_queryset(self):
         return Organization.objects.all()
@@ -28,8 +29,8 @@ class PracticeViewset(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     
     # fields to filter
-    search_field = ['name']
-    ordering_field = ['created_at']
+    search_fields = ['name']
+    ordering_fields = ['created_at']
     
     def get_queryset(self):
         user= self.request.user
@@ -39,16 +40,26 @@ class PracticeViewset(viewsets.ModelViewSet):
            return Practice.objects.filter(organization=user.organization)
         if user.control == 'pracadm':
             return Practice.objects.filter(id=user.practice.id)
+        
+class UserViewset(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializers
+    permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
+    
+    # fields for filter
+    ordering_fields = ['created_at']
     
 class ProcedureViewset(viewsets.ModelViewSet):
     queryset = Procedure.objects.all()
     serializer_class = ProcedureSerializers
     permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    authentication_classes = [SessionAuthentication]
     
     # fields to filter
-    search_field = ['title']
-    ordering_field = ['created_at']
+    search_fields = ['title']
+    ordering_fields = ['created_at']
     
     def get_queryset(self):
         user = self.request.user
