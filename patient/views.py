@@ -5,6 +5,9 @@ from patient.serializers import PatientSerializer, ClaimSerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters 
+from rest_framework.decorators import action
+from django.db import connection
+from rest_framework.response import Response
 
 # Create your views here.
 class PatientViewset(viewsets.ModelViewSet):
@@ -44,3 +47,25 @@ class ClaimViewset(viewsets.ModelViewSet):
             return Claim.objects.filter(patient_practice_organization=user.organization)
         if user.control == 'pracadm':
             return Claim.objects.filter(patient_practice = user.practice)
+    
+    @action(detail=False, methods=['get'])
+    def submitted(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                   SELECT COUNT(*)
+                   FROM patient_claim
+                   WHERE status = 'submitted'        
+            """)
+            row = cursor.fetchone()
+        return Response({"submitted": row[0]})
+    
+    @action(detail=False, methods=['get'])
+    def approved(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM patient_claim
+                WHERE status = 'approved'
+            """)
+            row = cursor.fetchone()
+        return Response({'approved': row[0]})

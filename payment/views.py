@@ -5,6 +5,10 @@ from payment.serializers import PaymentSerializer
 from rest_framework import permissions
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from rest_framework.decorators import action
+from django.db import connection
+from rest_framework.response import Response
+from django.db import transaction
 
 # Create your views here.
 class PaymentViewset(viewsets.ModelViewSet):
@@ -25,5 +29,23 @@ class PaymentViewset(viewsets.ModelViewSet):
             return Payment.objects.filter(claim_patient_practice_organization=user.organization)
         if user.control == 'pracadm':
             return Payment.objects.filter(claim_patient_practice=user.practice)
+    
+    @action(detail=False, methods=['get'])
+    def paid(self, request):
+        with connection.cursor() as cursor:
+            cursor.execute("""
+            SELECT SUM(amount) 
+            FROM payment_payment
+            WHERE completed = 1;              
+            """)
+            row = cursor.fetchone()
+        return Response({'paid':row[0]})
+    
+    @transaction.atomic
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        payment = serializer.save()
+        return Response(serializer.data)
             
 

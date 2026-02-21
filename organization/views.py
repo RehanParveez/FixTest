@@ -7,6 +7,9 @@ from organization.permissions import SuperPermission
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_framework.authentication import SessionAuthentication
+# from rest_framework.decorators import action
+# from django.db import connection
+# from rest_framework.response import Response
 
 # Create your views here.
 class OrganizationViewset(viewsets.ModelViewSet):
@@ -40,6 +43,13 @@ class PracticeViewset(viewsets.ModelViewSet):
            return Practice.objects.filter(organization=user.organization)
         if user.control == 'pracadm':
             return Practice.objects.filter(id=user.practice.id)
+    
+    # @action(detail=False, method=['get'])
+    # def revenue(self, request):
+    #     with connection.cursor() as cursor:
+    #         cursor.execute("""
+                           
+    #         """)
         
 class UserViewset(viewsets.ModelViewSet):
     queryset = User.objects.all()
