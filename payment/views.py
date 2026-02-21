@@ -9,6 +9,7 @@ from rest_framework.decorators import action
 from django.db import connection
 from rest_framework.response import Response
 from django.db import transaction
+from organization.permissions import SuperPermission, OrganizationPermission, PracticePermission
 
 # Create your views here.
 class PaymentViewset(viewsets.ModelViewSet):
@@ -21,14 +22,23 @@ class PaymentViewset(viewsets.ModelViewSet):
     search_fields = ['amount']
     ordering_fields = ['created_at']
     
+    def get_permissions(self):
+        if self.request.user.control == 'supadm':
+            return [SuperPermission()]
+        
+        if self.request.user.control == 'orgadm':
+            return [OrganizationPermission()]
+        
+        return [PracticePermission()]
+    
     def get_queryset(self):
         user = self.request.user
         if user.control == 'supadm':
            return Payment.objects.all()
         if user.control == 'orgadm':
-            return Payment.objects.filter(claim_patient_practice_organization=user.organization)
+            return Payment.objects.filter(claim__patient__practice__organization=user.organization)
         if user.control == 'pracadm':
-            return Payment.objects.filter(claim_patient_practice=user.practice)
+            return Payment.objects.filter(claim__patient__practice=user.practice)
     
     @action(detail=False, methods=['get'])
     def paid(self, request):

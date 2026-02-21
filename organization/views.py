@@ -10,6 +10,7 @@ from rest_framework.authentication import SessionAuthentication
 # from rest_framework.decorators import action
 # from django.db import connection
 # from rest_framework.response import Response
+from organization.permissions import SuperPermission, OrganizationPermission, PracticePermission
 
 # Create your views here.
 class OrganizationViewset(viewsets.ModelViewSet):
@@ -34,6 +35,15 @@ class PracticeViewset(viewsets.ModelViewSet):
     # fields to filter
     search_fields = ['name']
     ordering_fields = ['created_at']
+    
+    def get_permissions(self):
+        if self.request.user.control == 'supadm':
+            return [SuperPermission()]
+        
+        if self.request.user.control == 'orgadm':
+            return [OrganizationPermission()]
+        
+        return [PracticePermission()]
     
     def get_queryset(self):
         user= self.request.user
@@ -71,12 +81,11 @@ class ProcedureViewset(viewsets.ModelViewSet):
     search_fields = ['title']
     ordering_fields = ['created_at']
     
-    def get_queryset(self):
-        user = self.request.user
-        if user.control == 'supadm':
-            return Procedure.objects.all()
-        if user.control == 'orgadm':
-            return Procedure.objects.filter(claim_patient_practice_organization=user.organization)
-        if user.control == 'pracadm':
-            return Procedure.objects.filter(claim_patient_practice = user.practice)
+    def get_permissions(self):
+        if self.request.user.control == 'supadm':
+            return [SuperPermission()]
+        
+        if self.request.user.control == 'orgadm':
+            return [OrganizationPermission()]
+        return [PracticePermission()]
     

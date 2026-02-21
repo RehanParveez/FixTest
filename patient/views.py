@@ -8,6 +8,7 @@ from rest_framework import filters
 from rest_framework.decorators import action
 from django.db import connection
 from rest_framework.response import Response
+from organization.permissions import SuperPermission, OrganizationPermission, PracticePermission
 
 # Create your views here.
 class PatientViewset(viewsets.ModelViewSet):
@@ -20,12 +21,20 @@ class PatientViewset(viewsets.ModelViewSet):
     search_fields = ['name']
     ordering_fields = ['created_at']
     
+    def get_permission(self):
+        if self.request.user.control == 'supadm':
+            return [SuperPermission()]
+        
+        if self.request.user.control == 'orgadm':
+            return [OrganizationPermission()]
+        return [PracticePermission()]
+    
     def get_queryset(self):
         user = self.request.user
         if user.control == 'supadm':
            return Patient.objects.all()
         if user.control == 'orgadm':
-           return Patient.objects.filter(practice_organization=user.organization)
+           return Patient.objects.filter(practice__organization=user.organization)
         if user.control == 'pracadm':
             return Patient.objects.filter(practice=user.practice)
 
@@ -39,14 +48,23 @@ class ClaimViewset(viewsets.ModelViewSet):
     search_fields = ['title']
     ordering_fields = ['created_at']
     
+    def get_permissions(self):
+        if self.request.user.control == 'supadm':
+            return [SuperPermission()]
+        
+        if self.request.user.control == 'pracadm':
+            return [OrganizationPermission()]
+    
+        return [PracticePermission()]
+    
     def get_queryset(self):
         user = self.request.user
         if user.control == 'supadm':
            return Claim.objects.all()
         if user.control == 'orgadm':
-            return Claim.objects.filter(patient_practice_organization=user.organization)
+            return Claim.objects.filter(patient__practice__organization=user.organization)
         if user.control == 'pracadm':
-            return Claim.objects.filter(patient_practice = user.practice)
+            return Claim.objects.filter(patient__practice = user.practice)
     
     @action(detail=False, methods=['get'])
     def submitted(self, request):
