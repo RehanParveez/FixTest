@@ -20,6 +20,7 @@ class PatientViewset(viewsets.ModelViewSet):
     # fields to filter
     search_fields = ['name']
     ordering_fields = ['created_at']
+    filterset_fields = ['phone', 'practice']
     
     def get_permission(self):
         if self.request.user.control == 'supadm':
@@ -47,6 +48,7 @@ class ClaimViewset(viewsets.ModelViewSet):
     # fields to filter
     search_fields = ['title']
     ordering_fields = ['created_at']
+    filterset_fields = ['status','patient']
     
     def get_permissions(self):
         if self.request.user.control == 'supadm':

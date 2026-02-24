@@ -21,6 +21,7 @@ class PaymentViewset(viewsets.ModelViewSet):
     # fields to filter
     search_fields = ['amount']
     ordering_fields = ['created_at']
+    filterset_fields = ['completed','claim']
     
     def get_permissions(self):
         if self.request.user.control == 'supadm':
